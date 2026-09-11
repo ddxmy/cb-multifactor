@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this research framework, please cite the software repository."
+title: "Convertible Bond Multi-Factor Research"
+type: software
+authors:
+  - family-names: Xu
+    given-names: Mingyu
+repository-code: "https://github.com/ddxmy/cb-multifactor"
+url: "https://github.com/ddxmy/cb-multifactor"
+version: "0.1.0"
+date-released: 2026-09-11
+license: MIT

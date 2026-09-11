@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "batch_id": "baseline_factor_batch_v1",
+  "sample_partition": "replication_2018_2023",
+  "factors": [
+    {
+      "name": "conversion_premium",
+      "parameters": {}
+    },
+    {
+      "name": "double_low",
+      "parameters": {}
+    },
+    {
+      "name": "relative_premium_to_parity_median",
+      "parameters": {}
+    },
+    {
+      "name": "stock_return_20d",
+      "parameters": {}
+    },
+    {
+      "name": "cb_stock_return_spread",
+      "parameters": {
+        "window": 20
+      }
+    },
+    {
+      "name": "cb_return_20d",
+      "parameters": {}
+    },
+    {
+      "name": "cb_abnormal_turnover_20d",
+      "parameters": {}
+    }
+  ]
+}
