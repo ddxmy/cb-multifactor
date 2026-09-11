@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cb-multifactor"
+version = "0.1.0"
+description = "Convertible bond multi-factor research based on the Orient Securities framework"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "Mingyu Xu"}]
+requires-python = ">=3.11"
+keywords = [
+    "convertible-bonds",
+    "factor-investing",
+    "quantitative-finance",
+    "point-in-time",
+    "backtesting",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = [
+    "duckdb>=1.4,<2",
+    "jupyter>=1.0",
+    "matplotlib>=3.8",
+    "nbclient>=0.10",
+    "nbformat>=5.10",
+    "numpy>=1.26",
+    "pandas>=2.1,<3",
+    "pyarrow>=15",
+    "pyyaml>=6",
+    "scipy>=1.12",
+    "seaborn>=0.13",
+    "statsmodels>=0.14",
+    "tushare>=1.4",
+]
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2",
+  "pytest>=8",
+  "setuptools>=77",
+]
+
+[project.urls]
+Repository = "https://github.com/ddxmy/cb-multifactor"
+Documentation = "https://github.com/ddxmy/cb-multifactor#readme"
+Issues = "https://github.com/ddxmy/cb-multifactor/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["cb_quant*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "configuration_id": "cb_single_factor_backtest_v1",
+  "status": "framework_defaults_pending_research_gate",
+  "timing": {
+    "signal_time": "signal_day_close",
+    "execution_time": "next_market_trading_day_open",
+    "primary_label": "next_execution_open_to_open",
+    "daily_mark": "market_close"
+  },
+  "preprocessing": {
+    "mad_multiplier": 3.0,
+    "numeric_controls": [],
+    "categorical_controls": []
+  },
+  "evaluation": {
+    "quantile_groups": 5,
+    "minimum_ic_assets": 5,
+    "periods_per_year": 26,
+    "newey_west_lags": 5,
+    "forward_return_horizons_market_days": [1, 5, 10]
+  },
+  "portfolio": {
+    "portfolio_size": 20,
+    "cash_reserve": 0.1,
+    "maximum_single_name_weight": 0.1,
+    "initial_cash_yuan": 1000000.0
+  },
+  "execution": {
+    "one_way_cost_bps": 15.0,
+    "board_lot": 10,
+    "sell_before_buy": true,
+    "failed_sell_policy": "continue_holding_and_retry",
+    "failed_buy_policy": "retain_cash_without_automatic_retry",
+    "missing_open_policy": "no_fill_without_forward_fill",
+    "input_coverage_policy": "require_complete_tradability_and_lifecycle"
+  },
+  "lifecycle": {
+    "announced_redemption_blocks_entry": true,
+    "validated_terminal_terms_create_receivable": true,
+    "unresolved_terminal_settlement_policy": "raise_and_audit"
+  },
+  "parameter_status": {
+    "frozen": [
+      "timing.signal_time",
+      "timing.execution_time",
+      "timing.primary_label",
+      "evaluation.forward_return_horizons_market_days",
+      "execution.board_lot",
+      "execution.sell_before_buy",
+      "execution.failed_sell_policy",
+      "execution.failed_buy_policy"
+    ],
+    "pending_stage_gate": [
+      "preprocessing.mad_multiplier",
+      "preprocessing.numeric_controls",
+      "preprocessing.categorical_controls",
+      "evaluation.quantile_groups",
+      "portfolio.portfolio_size",
+      "portfolio.cash_reserve",
+      "portfolio.maximum_single_name_weight"
+    ]
+  }
+}

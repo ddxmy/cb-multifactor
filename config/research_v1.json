@@ -1,0 +1,223 @@
+{
+  "schema_version": "1.0",
+  "research_id": "cb_daily_multifactor_v1",
+  "status": "frozen_core_v1",
+  "title": "Daily-Frequency Convertible-Bond Multi-Factor and Tradable-Portfolio Research Based on the Orient Securities Framework",
+  "research_questions": [
+    "Do daily valuation, underlying-equity, stock-bond linkage, and bond-trading factors provide stable out-of-sample cross-sectional information?",
+    "Do relative-valuation and state-adjusted extensions add evidence beyond the reference-report baselines?",
+    "Does incremental factor evidence survive realistic execution timing, trading constraints, turnover, and costs?"
+  ],
+  "data": {
+    "formal_sample": {
+      "start": "2018-01-01",
+      "end": "2026-07-07"
+    },
+    "research_partitions": {
+      "report_replication_end": "2023-06-21",
+      "extension_validation_start": "2023-06-22",
+      "extension_validation_end": "2024-12-31",
+      "final_holdout_start": "2025-01-01"
+    },
+    "source_roles": {
+      "convertible_bond_daily": "Licensed daily convertible-bond market data",
+      "convertible_bond_terms": "Point-in-time convertible-bond terms and security master",
+      "point_in_time_events": "Point-in-time rating, conversion-term, balance, and redemption events",
+      "underlying_stock_daily": "Licensed A-share daily market and adjustment data",
+      "industry_membership": "Point-in-time CITIC Level-1 industry membership",
+      "intraday_data": "Optional intraday market data reserved for separate extensions"
+    },
+    "secrets_policy": "Credentials must be supplied through environment variables and must not be stored in configuration, source code, or notebooks"
+  },
+  "universe": {
+    "security_type": "ordinary_convertible_bond",
+    "mother_universe": "Intersection of ordinary convertible bonds in the point-in-time security master and bonds with observed daily market data from 2018 onward",
+    "minimum_listing_age_market_days": 11,
+    "turnover_window_market_days": 20,
+    "maximum_cumulative_turnover": 1.0,
+    "minimum_remaining_balance_yuan": 200000000,
+    "minimum_rating": "A",
+    "signal_day_real_trade_required": true,
+    "current_static_event_backfill_forbidden": true
+  },
+  "sampling": {
+    "frequency": "biweekly",
+    "anchor_signal_date": "2018-01-10",
+    "planned_signal_rule": "every_14_calendar_days",
+    "holiday_rule": "move_to_next_market_trading_day_without_shifting_future_anchors",
+    "signal_time": "signal_day_close",
+    "entry_time": "next_market_trading_day_open",
+    "exit_time": "next_rebalance_execution_open"
+  },
+  "returns": {
+    "primary_label": "next_execution_open_to_open_return",
+    "benchmark": "same_investable_universe_equal_weight",
+    "market_reference": "000832.CSI",
+    "missing_execution_price_policy": "mark_order_failed_without_forward_fill",
+    "label_end_date_purge_required": true
+  },
+  "factor_scope": {
+    "report_groups": [
+      "convertible_bond_valuation",
+      "underlying_stock_price_volume",
+      "stock_bond_linkage",
+      "convertible_bond_daily_price_volume"
+    ],
+    "implemented_foundations": [
+      "conversion_value",
+      "conversion_premium",
+      "double_low",
+      "same_parity_relative_premium"
+    ],
+    "daily_primary_research": true,
+    "intraday_factors_in_primary_research": false,
+    "extension_rule": "Each extension must document its incremental conditions, economic rationale, and out-of-sample evidence relative to the reference-report baseline"
+  },
+  "factor_evaluation": {
+    "primary_metric": "cross_sectional_rank_ic",
+    "required_outputs": [
+      "rank_ic",
+      "icir",
+      "positive_ic_rate",
+      "quantile_monotonicity",
+      "holding_period_decay",
+      "annual_stability",
+      "market_state_stability"
+    ],
+    "test_period_parameter_selection_forbidden": true
+  },
+  "preprocessing": {
+    "winsorization": {
+      "method": "cross_sectional_scaled_median_absolute_deviation",
+      "scope": "independent_within_signal_date",
+      "normal_consistency_scale": 1.4826,
+      "primary_multiplier": 3.0,
+      "sensitivity_multipliers": [2.5, 3.0, 3.5],
+      "missing_value_policy": "preserve",
+      "observation_policy": "clip_without_deleting_rows",
+      "selection_uses_forward_returns": false
+    },
+    "neutralization": {
+      "status": "valuation_and_stock_complete_other_families_pending",
+      "candidate_controls": [
+        "log_remaining_balance",
+        "log_stock_total_market_cap",
+        "rating",
+        "remaining_maturity",
+        "citic_level_1_industry"
+      ],
+      "stock_market_cap_control": {
+        "source": "point_in_time_a_share_daily_total_market_cap",
+        "match_rule": "latest_observation_on_or_before_signal_date",
+        "lookback_buffer_calendar_days": 365,
+        "future_fill_forbidden": true
+      },
+      "factor_policies": {
+        "conversion_premium": {
+          "numeric_controls": [],
+          "categorical_controls": [],
+          "rationale": "Preserve the full parity-dependent convertible-bond valuation structure."
+        },
+        "double_low": {
+          "numeric_controls": [],
+          "categorical_controls": [],
+          "rationale": "Preserve the intended joint price and conversion-premium signal."
+        },
+        "relative_premium_to_parity_median": {
+          "numeric_controls": ["log_remaining_balance", "remaining_maturity_years"],
+          "categorical_controls": ["rating"],
+          "rationale": "Parity is controlled by construction; remove residual balance, credit, and maturity exposures."
+        },
+        "parity_value_score": {
+          "numeric_controls": ["log_remaining_balance", "remaining_maturity_years"],
+          "categorical_controls": ["rating"],
+          "rationale": "Process the direction-reversed audit counterpart consistently; retain only one version during redundancy selection."
+        },
+        "stock_return_5d": {
+          "numeric_controls": ["log_stock_total_market_cap"],
+          "categorical_controls": ["ci_industry_control"],
+          "rationale": "Remove broad industry and underlying-equity size exposures from the short-horizon stock return signal."
+        },
+        "stock_return_10d": {
+          "numeric_controls": ["log_stock_total_market_cap"],
+          "categorical_controls": ["ci_industry_control"],
+          "rationale": "Remove broad industry and underlying-equity size exposures from the medium-horizon stock return signal."
+        },
+        "stock_return_20d": {
+          "numeric_controls": ["log_stock_total_market_cap"],
+          "categorical_controls": ["ci_industry_control"],
+          "rationale": "Remove broad industry and underlying-equity size exposures from the monthly stock return signal."
+        },
+        "stock_volatility_20d": {
+          "numeric_controls": ["log_stock_total_market_cap"],
+          "categorical_controls": ["ci_industry_control"],
+          "rationale": "Measure stock volatility beyond systematic industry and company-size effects."
+        },
+        "stock_rsi_20d": {
+          "numeric_controls": ["log_stock_total_market_cap"],
+          "categorical_controls": ["ci_industry_control"],
+          "rationale": "Measure stock price strength beyond systematic industry and company-size effects."
+        },
+        "stock_price_to_high_20d": {
+          "numeric_controls": ["log_stock_total_market_cap"],
+          "categorical_controls": ["ci_industry_control"],
+          "rationale": "Measure proximity to the recent high beyond systematic industry and company-size effects."
+        },
+        "stock_percent_b_20d": {
+          "numeric_controls": ["log_stock_total_market_cap"],
+          "categorical_controls": ["ci_industry_control"],
+          "rationale": "Measure Bollinger-band position beyond systematic industry and company-size effects."
+        },
+        "stock_amihud_20d": {
+          "numeric_controls": ["log_stock_total_market_cap"],
+          "categorical_controls": ["ci_industry_control"],
+          "rationale": "Separate stock illiquidity from its mechanical industry and company-size exposures."
+        },
+        "stock_mfi_20d": {
+          "numeric_controls": ["log_stock_total_market_cap"],
+          "categorical_controls": ["ci_industry_control"],
+          "rationale": "Measure volume-weighted stock buying pressure beyond systematic industry and company-size effects."
+        }
+      }
+    },
+    "standardization": {
+      "method": "cross_sectional_population_zscore",
+      "status": "valuation_and_stock_complete_other_families_pending"
+    }
+  },
+  "portfolio": {
+    "execution": "next_market_trading_day_open",
+    "one_way_cost_bps": 15,
+    "sell_before_buy": true,
+    "failed_sell_policy": "continue_holding_and_retry",
+    "failed_buy_policy": "retain_cash",
+    "execution_day_full_day_liquidity_lookahead_forbidden": true
+  },
+  "stage_protocol": [
+    "define_economic_rationale_and_formula",
+    "freeze_parameters_and_information_timing",
+    "validate_bounded_sample_formulas_and_reasonableness",
+    "materialize_full_sample_artifacts",
+    "run_independent_audit",
+    "publish_research_notebook",
+    "approve_stage_gate_before_advancing"
+  ],
+  "stages": [
+    {"id": "G0", "name": "Research Specification and Engineering Baseline", "status": "complete"},
+    {"id": "G1", "name": "Point-in-Time Data and Investable Universe", "status": "complete"},
+    {"id": "G2", "name": "Valuation Coordinate System and Foundation Factors", "status": "complete"},
+    {"id": "G3", "name": "Complete Daily Factor Panel", "status": "complete"},
+    {"id": "G4", "name": "Forward Returns and Leakage-Free Partitions", "status": "complete"},
+    {"id": "G5", "name": "Single-Factor Evaluation and Selection", "status": "in_progress"},
+    {"id": "G6", "name": "Factor Combination and Model Increment", "status": "pending"},
+    {"id": "G7", "name": "Constraint-Aware Portfolio Simulation", "status": "in_progress"},
+    {"id": "G8", "name": "Final Research Release", "status": "pending"}
+  ],
+  "pending_decisions": [
+    "Industry, balance, rating, and maturity neutralization by factor family",
+    "TOP-N portfolio size and bond-type balancing rule",
+    "Historical trading-capacity threshold and order participation rate",
+    "Boundary between linear factor combinations and Ridge or Elastic Net as the primary model",
+    "Second-stage total-return treatment for coupons, puts, and special delistings"
+  ]
+}
