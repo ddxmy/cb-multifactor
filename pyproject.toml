@@ -30,7 +30,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Information Analysis",
 ]
 dependencies = [
-    "duckdb>=1.4,<2",
+    "duckdb>=1.4,<3",
     "jupyter>=1.0",
     "matplotlib>=3.8",
     "nbclient>=0.10",
